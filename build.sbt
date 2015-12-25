@@ -17,9 +17,7 @@ libraryDependencies ++= Seq(
 
     // Reactive Stream Dependencies
     "com.typesafe.akka" %% "akka-http-experimental" % akkaStreamsVersion,
-
-    // JSON
-    "org.json4s" %% "json4s-jackson" % "3.3.0",
+    "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaStreamsVersion,
 
     // Logging
     "org.apache.logging.log4j" % "log4j-slf4j-impl" % log4j2Version,

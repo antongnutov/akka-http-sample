@@ -6,13 +6,14 @@ import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCode, StatusCo
 import akka.stream.scaladsl.ImplicitMaterializer
 import akka.util.ByteString
 import sample.CheckHttpActor.{CheckRequest, CheckResponse, GracefulStop}
+import spray.json._
 
-import scala.util.{Failure, Success}
+import scala.util.{Try, Failure, Success}
 
 /**
   * @author Anton Gnutov
   */
-class CheckHttpActor extends Actor with ImplicitMaterializer with JsonSerializer with ActorLogging {
+class CheckHttpActor extends Actor with ImplicitMaterializer with JsonSupport with ActorLogging {
 
   import akka.pattern.pipe
   import context.dispatcher
@@ -35,7 +36,7 @@ class CheckHttpActor extends Actor with ImplicitMaterializer with JsonSerializer
       val string: String = bs.decodeString("UTF-8")
       log.info("Received response: {}", string)
 
-      decodeClusterState(string) match {
+      Try(string.parseJson.convertTo[ClusterState]) match {
         case Success(state) => log.info("Cluster state: {}", state)
         case Failure(e) => log.warning("Could not deserialize cluster state: {}", e.getMessage)
       }
