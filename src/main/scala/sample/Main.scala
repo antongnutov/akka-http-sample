@@ -5,11 +5,11 @@ import akka.pattern.ask
 import akka.util.Timeout
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
-import sample.CheckHttpActor.{CheckRequest, CheckResponse, Stop}
+import sample.CheckHttpActor.{CheckRequest, CheckResponse, GracefulStop}
 
 import scala.concurrent.ExecutionContext
 import scala.concurrent.duration._
-import scala.util.{Try, Failure, Success}
+import scala.util.{Failure, Success}
 
 object Main extends App {
   val log = LoggerFactory.getLogger(Main.getClass)
@@ -32,7 +32,7 @@ object Main extends App {
   }
 
   def stopAll(): Unit = {
-    (system.actorSelection("/user/CheckHttp") ? Stop).onComplete {
+    (system.actorSelection("/user/CheckHttp") ? GracefulStop).onComplete {
       case Success(_) =>
         log.info("Stopped successfully")
         system.terminate()

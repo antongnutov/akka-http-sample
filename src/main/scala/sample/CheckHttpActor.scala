@@ -1,11 +1,11 @@
 package sample
 
-import akka.actor.{PoisonPill, Actor, ActorLogging, Props}
+import akka.actor.{Actor, ActorLogging, Props}
 import akka.http.scaladsl.Http
-import akka.http.scaladsl.model.{StatusCode, HttpRequest, HttpResponse, StatusCodes}
+import akka.http.scaladsl.model.{HttpRequest, HttpResponse, StatusCode, StatusCodes}
 import akka.stream.scaladsl.ImplicitMaterializer
 import akka.util.ByteString
-import sample.CheckHttpActor.{Stop, CheckResponse, CheckRequest}
+import sample.CheckHttpActor.{CheckRequest, CheckResponse, GracefulStop}
 
 import scala.util.{Failure, Success}
 
@@ -42,7 +42,7 @@ class CheckHttpActor extends Actor with ImplicitMaterializer with JsonSerializer
 
       sender() ! CheckResponse(StatusCodes.OK)
 
-    case Stop => http.shutdownAllConnectionPools().pipeTo(sender())
+    case GracefulStop => http.shutdownAllConnectionPools().pipeTo(sender())
   }
 }
 
@@ -51,6 +51,6 @@ object CheckHttpActor {
 
   case class CheckRequest(uri: String)
   case class CheckResponse(code: StatusCode)
-  case object Stop
+  case object GracefulStop
 }
 
