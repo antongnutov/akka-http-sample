@@ -22,7 +22,7 @@ object Main extends App {
   implicit val timeout = Timeout(10.seconds)
   implicit val executor = ExecutionContext.global
 
-  val response = (system.actorOf(CheckHttpActor.props, "CheckHttp") ? CheckRequest(uri)).mapTo[CheckResponse].onComplete {
+  val response = (system.actorOf(CheckHttpActor.props, "checkHttp") ? CheckRequest(uri)).mapTo[CheckResponse].onComplete {
     case Success(value) =>
       log.info("Received response code: {}", value.code)
       stopAll()
@@ -32,7 +32,7 @@ object Main extends App {
   }
 
   def stopAll(): Unit = {
-    (system.actorSelection("/user/CheckHttp") ? GracefulStop).onComplete {
+    (system.actorSelection("/user/checkHttp") ? GracefulStop).onComplete {
       case Success(_) =>
         log.info("Stopped successfully")
         system.terminate()
