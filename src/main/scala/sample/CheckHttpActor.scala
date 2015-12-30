@@ -22,10 +22,12 @@ class CheckHttpActor extends Actor with ImplicitMaterializer with JsonSerializer
   override def receive = {
     case CheckRequest(uri) =>
       log.debug("Checking uri: {} ...", uri)
-      http.singleRequest(HttpRequest(uri = uri)).pipeTo(self)(sender())
+      val replyTo = sender()
+      http.singleRequest(HttpRequest(uri = uri)).pipeTo(self)(replyTo)
 
     case HttpResponse(StatusCodes.OK, headers, entity, _) =>
-      entity.dataBytes.runFold(ByteString(""))(_ ++ _).pipeTo(self)(sender())
+      val replyTo = sender()
+      entity.dataBytes.runFold(ByteString(""))(_ ++ _).pipeTo(self)(replyTo)
 
     case HttpResponse(code, _, _, _) =>
       log.warning("Request failed, response code: {}", code)
